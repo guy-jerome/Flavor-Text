@@ -1,0 +1,19 @@
+{
+  "name": "flavor-text",
+  "version": "1.0.0",
+  "description": "Flavor Text Generator for Table Top Role Playing Games",
+  "main": "server.js",
+  "type": "module",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "dotenv": "^16.3.1",
+    "express": "^4.18.2",
+    "openai": "^4.17.5"
+  }
+}
