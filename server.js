@@ -26,12 +26,15 @@ io.on('connection', (socket) => {
 
 
 app.post('/stream', async (req, res)=>{
-  const {worldName, worldDescription } = req.body
-  const fullDescription = await generateText(req,res,worldName, worldDescription)
-  await postWorld(worldName,worldDescription,fullDescription)
+  const {name, simpledes } = req.body
+  const fullDescription = await generateText(req,res,name,simpledes)
   res.status(200).json({message: "stream complete"})
 })
-
+app.post('/streamsave', async (req, res)=>{
+  const {name, simpledes,fulldes} = req.body
+  const data = await postWorld(name,simpledes,fulldes)
+  res.status(200).json({message:"world saved"})
+})
 const PORT = process.env.PORT || 3000;
 
 server.listen(PORT, () => {
@@ -39,10 +42,10 @@ server.listen(PORT, () => {
 });
 
 
-async function postWorld(name,simpleDescription, fullDescription) {
+async function postWorld(name,simpledes, fulldes) {
   const client = await pool.connect();
-  const response = await client.query('INSERT INTO worlds (name, simpledes, fulldes) VALUES ($1,$2,$3) RETURNING *;',[name,simpleDescription,fullDescription])
-  console.log(response.rows);
+  const response = await client.query('INSERT INTO worlds (name, simpledes, fulldes) VALUES ($1,$2,$3) RETURNING *;',[name,simpledes,fulldes])
+  return response.rows
 }
 
 
@@ -55,8 +58,8 @@ const systemContent =
  You are precise and unique.";
 
 
-async function generateText(req, res,name, description) {
-  const userMessage = `Create the description of a fantasy world with the name of ${name} using the basic description of ${description}`
+async function generateText(req, res,name, simpledes) {
+  const userMessage = `Create the description of a fantasy world with the name of ${name} using the basic description of ${simpledes}`
   const socket = req.app.get('socket')
   const completionStream = await openai.chat.completions.create({
     messages: [

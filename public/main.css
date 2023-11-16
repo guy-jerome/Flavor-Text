@@ -1,0 +1,5 @@
+#world-full-description{
+  height: 60vh;
+  width: 60vw;
+  overflow-y: scroll;
+}
