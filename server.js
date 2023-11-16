@@ -1,7 +1,7 @@
 
 const OpenAI = require('openai');
 const dotenv = require('dotenv');
-const { pool } = require('./db.js');
+const pool = require('./db.js');
 const { pipeline } = require('stream');
 const express = require('express');
 const http = require('http');
@@ -27,7 +27,8 @@ io.on('connection', (socket) => {
 
 app.post('/stream', async (req, res)=>{
   const {worldName, worldDescription } = req.body
-  const text = await generateText(req,res,worldName, worldDescription)
+  const fullDescription = await generateText(req,res,worldName, worldDescription)
+  await postWorld(worldName,worldDescription,fullDescription)
   res.status(200).json({message: "stream complete"})
 })
 
@@ -38,10 +39,9 @@ server.listen(PORT, () => {
 });
 
 
-
-async function search() {
+async function postWorld(name,simpleDescription, fullDescription) {
   const client = await pool.connect();
-  const response = await client.query('SELECT * FROM student');
+  const response = await client.query('INSERT INTO worlds (name, simpledes, fulldes) VALUES ($1,$2,$3) RETURNING *;',[name,simpleDescription,fullDescription])
   console.log(response.rows);
 }
 
