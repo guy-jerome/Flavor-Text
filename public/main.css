@@ -1,5 +1,84 @@
-#world-full-description{
-  height: 60vh;
-  width: 60vw;
-  overflow-y: scroll;
+body {
+  font-family: 'Roboto', 'Arial', sans-serif;
+  margin: 0;
+  padding: 0;
+  background-color: #f0f0f0;
+}
+
+main {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  margin: 20px;
+}
+
+.component {
+  background-color: #ffffff;
+  border-radius: 10px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  margin: 20px 0;
+  padding: 20px;
+  width: 600px;
+  max-width: 100%;
+  transition: box-shadow 0.3s ease-in-out;
+}
+
+.component:hover {
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+}
+
+.input-field,
+.textarea-field,
+.select-field {
+  width: 100%;
+  padding: 12px;
+  margin-top: 15px;
+  margin-bottom: 15px;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  box-sizing: border-box;
+  font-size: 14px;
+}
+
+.textarea-field{
+  height: 500px;
+}
+
+.submit-btn,
+.save-btn,
+.select-btn,
+.menu-btn {
+  background-color: #3498db;
+  color: #fff;
+  border: none;
+  padding: 12px 20px;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 16px;
+  transition: background-color 0.3s ease-in-out;
+}
+
+.submit-btn:hover,
+.save-btn:hover,
+.select-btn:hover,
+.menu-btn:hover {
+  background-color: #2980b9;
+}
+
+textarea {
+  resize: none;
+}
+
+nav {
+  text-align: center;
+  margin-top: 20px;
+}
+
+.menu-btn {
+  background-color: #2ecc71;
+}
+
+.menu-btn:hover {
+  background-color: #27ae60;
 }

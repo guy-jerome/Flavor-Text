@@ -30,14 +30,24 @@ const $locationFullDescription = $('#location-full-description');
 const $locationSaveBtn = $('#location-save-btn')
 const $locationSelect = $('#location-select')
 const $locationSelectBtn = $("#location-select-btn")
+//Nav components
+const $nav = $("nav")
+const $goMenuBtn = $('#go-menu-btn')
+
+
 
 let page = "menu"
+
+const worldBtns = [$worldSelectBtn,$worldBtn,$worldSaveBtn]
+const areaBtns = [$areaSelectBtn, $areaBtn, $areaSaveBtn];
+const locationBtns = [$locationSelectBtn, $locationBtn, $locationSaveBtn];
 
 function navigateToMenu(){
   page = "menu"
   $world.hide()
   $area.hide()
   $location.hide()
+  $nav.hide()
   $menu.show()
 }
 function navigateToWorld(){
@@ -46,6 +56,8 @@ function navigateToWorld(){
   $area.hide()
   $location.hide()
   $world.show()
+  $goMenuBtn.show()
+  $nav.show()
   getWorlds()
 }
 function navigateToArea(){
@@ -54,6 +66,7 @@ function navigateToArea(){
   $world.hide()
   $location.hide()
   $area.show()
+  $nav.show()
 }
 function navigateToLocation(){
   page = "location"
@@ -61,6 +74,7 @@ function navigateToLocation(){
   $world.hide()
   $area.hide()
   $location.show()
+  $nav.show()
 }
 
 navigateToMenu()
@@ -68,12 +82,18 @@ navigateToMenu()
 const socket = io()
 
 
+$goMenuBtn.on("click", navigateToMenu)
 $goWorldBtn.on("click",navigateToWorld) 
 $goAreaBtn.on("click", navigateToArea)
 $goLocationBtn.on("click", navigateToLocation)
 
 
-$worldBtn.on("click", getStream)
+$worldBtn.on("click", ()=>{
+  getStream(worldBtns, {
+    name: $worldName.val(),
+    simpledes: $worldDescription.val()
+  })
+})
 $worldSaveBtn.on("click", saveWorld)
 $worldSelectBtn.on("click", loadWorld)
 
@@ -85,29 +105,23 @@ socket.on('stream-chunk', (chunk) => {
   }
 });
 
-async function getStream() {
-  $worldSaveBtn.prop("disabled", true)
-  $worldBtn.prop("disabled", true)
-  $worldSelectBtn.prop("disabled", true)
+
+async function getStream($btnArray,descriptions) {
+  hideBtns($btnArray)
   try {
     const response = await fetch('/stream', {
       method: "POST",
       headers: {
         'Content-Type': 'application/json'
       },
-      body: JSON.stringify({
-        name: $worldName.val(),
-        simpledes: $worldDescription.val()
-      })
+      body: JSON.stringify(descriptions)
     });
     const data = await response.json();
     console.log(data);
   } catch (error) {
     console.error('Error fetching stream:', error);
   } finally {
-    $worldSaveBtn.prop("disabled", false)
-    $worldBtn.prop("disabled", false)
-    $worldSelectBtn.prop("disabled", false)
+    showBtns($btnArray)
   }
 }
 
@@ -134,14 +148,15 @@ async function saveWorld() {
 
 async function getWorlds() {
   try {
+    console.log("get")
     const response = await fetch('/worlds');
     const data = await response.json();
 
-    $select.empty();
+    $worldSelect.empty();
 
     for (let world of data) {
       const option = `<option value="${world.id}">${world.name}</option>`;
-      $select.append(option);
+      $worldSelect.append(option);
     }
   } catch (error) {
     console.error('Error fetching worlds:', error);
@@ -163,4 +178,16 @@ async function loadWorld() {
   } catch (error) {
     console.error('Error loading world:', error);
   }
+}
+
+function hideBtns($btnArray){
+  $btnArray.forEach(($btn)=>{
+    $btn.prop("disabled",true)
+  })
+}
+
+function showBtns($btnArray){
+  $btnArray.forEach(($btn)=>{
+    $btn.prop("disabled",false)
+  })
 }
