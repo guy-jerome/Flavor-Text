@@ -92,7 +92,7 @@ async function getAreaByIdHandler(req, res) {
 // Location
 async function locationStreamHandler(req, res) {
   const { name, simpledes } = req.body;
-  const userMessage = `Create the description of a fantasy location with the name of ${name} using the basic description of ${simpledes}`;
+  const userMessage = `Create the description of a fantasy location within an Area the name of ${name} using the basic description of ${simpledes}`;
   const fullDescription = await chatgtp(req, userMessage, systemContent);
   res.status(200).json({ message: "stream complete" });
 }

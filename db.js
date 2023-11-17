@@ -24,4 +24,5 @@ async function dataBaseQuery(query, args = []) {
 module.exports = {
   pool,
   dataBaseQuery,
+
 };

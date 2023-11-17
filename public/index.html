@@ -6,11 +6,15 @@
   <title>main</title>
   <script src="https://code.jquery.com/jquery-3.7.1.js" integrity="sha256-eKhayi8LEQwp4NKxN+CfCh+3qOVUtJn3QNZ0TciWLP4=" crossorigin="anonymous"></script>
   <script defer src="/socket.io/socket.io.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@simondmc/popup-js@1.4.2/popup.min.js"></script>
   <script defer src="main.js"></script>
   <link rel="stylesheet" href="main.css"/>
   
 </head>
 <body>
+  <nav>
+    <button id="go-menu-btn" class="menu-btn">Return to Menu</button>
+  </nav>
   <main>
     <div id="menu">
       <button id="go-world-btn" class="menu-btn">Create A World</button>
@@ -30,26 +34,30 @@
       <button id="world-select-btn" class="select-btn">Select a world</button>
     </div>
     <div id="area" class="component">
+      <label for="area-name" class="input-label">Area Name</label>
       <input type="text" id="area-name" class="input-field">
+      <label for="area-description" class="input-label">Area Basic Description</label>
       <input type="text" id="area-description" class="input-field">
       <button id="area-btn" class="submit-btn">Submit</button>
+      <label for="Area-full-description" class="input-label">Area Full Description</label>
       <textarea id="area-full-description" class="textarea-field"></textarea>
       <button id="area-save-btn" class="save-btn">Save Area</button>
       <select id="area-select" class="select-field"></select>
       <button id="area-select-btn" class="select-btn">Select an area</button>
     </div>
     <div id="location" class="component">
+      <label for="location-name" class="input-label">Location Name</label>
       <input type="text" id="location-name" class="input-field">
+      <label for="location-description" class="input-label">Location Basic Description</label>
       <input type="text" id="location-description" class="input-field">
       <button id="location-btn" class="submit-btn">Submit</button>
+      <label for="location-full-description" class="input-label">Location Full Description</label>
       <textarea id="location-full-description" class="textarea-field"></textarea>
       <button id="location-save-btn" class="save-btn">Save Location</button>
       <select id="location-select" class="select-field"></select>
       <button id="location-select-btn" class="select-btn">Select a location</button>
     </div>
+    
   </main>
-  <nav>
-    <button id="go-menu-btn" class="menu-btn">Return to Menu</button>
-  </nav>
 </body>
 </html>

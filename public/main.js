@@ -37,10 +37,14 @@ const $goMenuBtn = $('#go-menu-btn')
 
 
 let page = "menu"
-
+//btns
 const worldBtns = [$worldSelectBtn,$worldBtn,$worldSaveBtn]
 const areaBtns = [$areaSelectBtn, $areaBtn, $areaSaveBtn];
 const locationBtns = [$locationSelectBtn, $locationBtn, $locationSaveBtn];
+//fill boxes
+const worldInput = [$worldName, $worldDescription, $worldFullDescription]
+const areaInput = [$areaName, $areaDescription, $areaFullDescription]
+const locationInput = [$locationName, $locationDescription, $locationFullDescription]
 
 function navigateToMenu(){
   page = "menu"
@@ -49,6 +53,7 @@ function navigateToMenu(){
   $location.hide()
   $nav.hide()
   $menu.show()
+  
 }
 function navigateToWorld(){
   page = "world"
@@ -58,7 +63,7 @@ function navigateToWorld(){
   $world.show()
   $goMenuBtn.show()
   $nav.show()
-  getWorlds()
+  loadSaves($worldSelect)
 }
 function navigateToArea(){
   page = "area"
@@ -67,6 +72,7 @@ function navigateToArea(){
   $location.hide()
   $area.show()
   $nav.show()
+  loadSaves($areaSelect)
 }
 function navigateToLocation(){
   page = "location"
@@ -75,6 +81,7 @@ function navigateToLocation(){
   $area.hide()
   $location.show()
   $nav.show()
+  loadSaves($locationSelect)
 }
 
 navigateToArea()
@@ -96,8 +103,16 @@ $worldBtn.on("click", ()=>{
   })
 })
 
-$worldSaveBtn.on("click", saveWorld)
-$worldSelectBtn.on("click", loadWorld)
+$worldSaveBtn.on("click", ()=>{
+  save({
+    name: $worldName.val(),
+    simpledes: $worldDescription.val(),
+    fulldes: $worldFullDescription.val()
+  })
+})
+
+$worldSelectBtn.on("click", worldLoadSave)
+
 // AREA BUTTONS
 $areaBtn.on("click", ()=>{
   getStream(areaBtns, {
@@ -106,18 +121,49 @@ $areaBtn.on("click", ()=>{
   })
 })
 
+$areaSaveBtn.on("click", ()=>{
+  save({
+    name: $areaName.val(),
+    simpledes: $areaDescription.val(),
+    fulldes: $areaFullDescription.val()
+  })
+})
+
+$areaSelectBtn.on("click", areaLoadSave)
+// LOCATION BUTTONS
+$locationBtn.on("click", ()=>{
+  getStream(locationBtns, {
+    name: $locationName.val(),
+    simpledes: $locationDescription.val()
+  })
+})
+
+$locationSaveBtn.on("click", ()=>{
+  save({
+    name: $locationName.val(),
+    simpledes: $locationDescription.val(),
+    fulldes: $locationFullDescription.val()
+  })
+})
+
+$locationSelectBtn.on("click", locationLoadSave)
+
+
 socket.on('stream-chunk', (chunk) => {
   let currentVal;
   switch (page){
     case "world":
       currentVal = $worldFullDescription.val()
       $worldFullDescription.val(currentVal + chunk)
+      break;
     case "area":
       currentVal = $areaFullDescription.val()
       $areaFullDescription.val(currentVal + chunk)
+      break;
     case "location":
       currentVal = $locationFullDescription.val()
       $locationFullDescription.val(currentVal + chunk)
+      break;
   }
 
 });
@@ -142,52 +188,54 @@ async function getStream($btnArray,descriptions) {
   }
 }
 
-async function saveWorld() {
+async function save(descriptions) {
   try {
-    const response = await fetch('/world-save', {
+    const response = await fetch(`/${page}-save`, {
       method: "POST",
       headers: {
         'Content-Type': 'application/json'
       },
-      body: JSON.stringify({
-        name: $worldName.val(),
-        simpledes: $worldDescription.val(),
-        fulldes: $worldFullDescription.val()
-      })
+      body: JSON.stringify(descriptions)
     });
     const data = await response.json();
-    getWorlds();
+    switch (page){
+      case "world":
+        loadSaves($worldSelect)
+        break;
+      case "area":
+        loadSaves($areaSelect)
+        break;
+      case "location":
+        loadSaves($locationSelect)
+        break;
+
+
+    }
   } catch (error) {
     console.error('Error saving world:', error);
   }
 }
 
-async function getWorlds() {
+async function loadSaves(select) {
   try {
-    console.log("get")
-    const response = await fetch('/worlds');
+    const response = await fetch(`/${page}s`);
     const data = await response.json();
 
-    $worldSelect.empty();
+    select.empty();
 
-    for (let world of data) {
-      const option = `<option value="${world.id}">${world.name}</option>`;
-      $worldSelect.append(option);
+    for (let entry of data) {
+      const option = `<option value="${entry.id}">${entry.name}</option>`;
+      select.append(option);
     }
   } catch (error) {
     console.error('Error fetching worlds:', error);
   }
 }
 
-async function loadWorld() {
+async function worldLoadSave() {
   try {
-    $worldName.val("");
-    $worldDescription.val("");
-    $worldFullDescription.val("");
-
     const response = await fetch(`/worlds/${$worldSelect.val()}`);
     const data = await response.json();
-
     $worldName.val(data[0].name);
     $worldDescription.val(data[0].simpledes);
     $worldFullDescription.val(data[0].fulldes);
@@ -196,10 +244,29 @@ async function loadWorld() {
   }
 }
 
-async function getAreaStream($btnArray,descriptions){
-
+async function areaLoadSave(){
+  try{
+    const response = await fetch(`/areas/${$areaSelect.val()}`);
+    const data = await response.json();
+    $areaName.val(data[0].name);
+    $areaDescription.val(data[0].simpledes);
+    $areaFullDescription.val(data[0].fulldes);
+  } catch (error){
+    console.error('Error loading area:', error);
+  }
 }
 
+async function locationLoadSave(){
+  try{
+    const response = await fetch(`/locations/${$locationSelect.val()}`);
+    const data = await response.json();
+    $locationName.val(data[0].name);
+    $locationDescription.val(data[0].simpledes);
+    $locationFullDescription.val(data[0].fulldes);
+  } catch (error){
+    console.error('Error loading location:', error);
+  }
+}
 
 
 
