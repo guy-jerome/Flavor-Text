@@ -1,3 +1,9 @@
+const OpenAI = require('openai');
+const dotenv = require('dotenv');
+
+dotenv.config();
+const openai = new OpenAI({ apiKey: process.env.CHATGTP_API_KEY });
+
 async function generateText(req,userMessage, systemContent) {
     const socket = req.app.get('socket');
     const completionStream = await openai.chat.completions.create({
