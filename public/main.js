@@ -77,10 +77,9 @@ function navigateToLocation(){
   $nav.show()
 }
 
-navigateToMenu()
+navigateToArea()
 
 const socket = io()
-
 
 $goMenuBtn.on("click", navigateToMenu)
 $goWorldBtn.on("click",navigateToWorld) 
@@ -88,28 +87,46 @@ $goAreaBtn.on("click", navigateToArea)
 $goLocationBtn.on("click", navigateToLocation)
 
 
+
+// WORLD BUTTONS
 $worldBtn.on("click", ()=>{
   getStream(worldBtns, {
     name: $worldName.val(),
     simpledes: $worldDescription.val()
   })
 })
+
 $worldSaveBtn.on("click", saveWorld)
 $worldSelectBtn.on("click", loadWorld)
-
+// AREA BUTTONS
+$areaBtn.on("click", ()=>{
+  getStream(areaBtns, {
+    name: $areaName.val(),
+    simpledes: $areaDescription.val()
+  })
+})
 
 socket.on('stream-chunk', (chunk) => {
-  if (page === "world"){
-    let currentVal = $worldFullDescription.val()
-    $worldFullDescription.val(currentVal + chunk)
+  let currentVal;
+  switch (page){
+    case "world":
+      currentVal = $worldFullDescription.val()
+      $worldFullDescription.val(currentVal + chunk)
+    case "area":
+      currentVal = $areaFullDescription.val()
+      $areaFullDescription.val(currentVal + chunk)
+    case "location":
+      currentVal = $locationFullDescription.val()
+      $locationFullDescription.val(currentVal + chunk)
   }
+
 });
 
 
 async function getStream($btnArray,descriptions) {
   hideBtns($btnArray)
   try {
-    const response = await fetch('/stream', {
+    const response = await fetch(`/${page}-stream`, {
       method: "POST",
       headers: {
         'Content-Type': 'application/json'
@@ -127,7 +144,7 @@ async function getStream($btnArray,descriptions) {
 
 async function saveWorld() {
   try {
-    const response = await fetch('/streamsave', {
+    const response = await fetch('/world-save', {
       method: "POST",
       headers: {
         'Content-Type': 'application/json'
@@ -138,7 +155,6 @@ async function saveWorld() {
         fulldes: $worldFullDescription.val()
       })
     });
-
     const data = await response.json();
     getWorlds();
   } catch (error) {
@@ -179,6 +195,14 @@ async function loadWorld() {
     console.error('Error loading world:', error);
   }
 }
+
+async function getAreaStream($btnArray,descriptions){
+
+}
+
+
+
+
 
 function hideBtns($btnArray){
   $btnArray.forEach(($btn)=>{
