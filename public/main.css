@@ -54,6 +54,8 @@ main {
   background-color: #3498db;
   color: #fff;
   border: none;
+  margin-top: 1em;
+  margin-bottom: 1em;
   padding: 12px 20px;
   border-radius: 5px;
   cursor: pointer;

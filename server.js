@@ -68,15 +68,16 @@ async function getWorldByIdHandler(req, res) {
 }
 // Area
 async function areaStreamHandler(req, res) {
-  const { name, simpledes } = req.body;
-  const userMessage = `Create the description of a fantasy area within a world with the name of ${name} using the basic description of ${simpledes}`;
+  const { name, simpledes, world } = req.body;
+  const currentWorld = await dataBaseQuery('SELECT * FROM worlds WHERE id = $1',[world])
+  const userMessage = `Create the description of a fantasy area within ${currentWorld[0].name || "fantasy world"} with this description: ${currentWorld[0].fulldes || "no description"} with the name of ${name} using the basic description of ${simpledes}`;
   const fullDescription = await chatgtp(req, userMessage, systemContent);
   res.status(200).json({ message: "stream complete" });
 }
 
 async function areaSaveHandler(req, res) {
-  const { name, simpledes, fulldes } = req.body;
-  const data = await dataBaseQuery('INSERT INTO areas (name, simpledes, fulldes) VALUES ($1,$2,$3) RETURNING *;', [name, simpledes, fulldes]);
+  const { name, simpledes, fulldes, world } = req.body;
+  const data = await dataBaseQuery('INSERT INTO areas (name, simpledes, fulldes, world_id) VALUES ($1,$2,$3,$4) RETURNING *;', [name, simpledes, fulldes, world]);
   res.status(200).json({ message: "area saved" });
 }
 
@@ -91,15 +92,17 @@ async function getAreaByIdHandler(req, res) {
 }
 // Location
 async function locationStreamHandler(req, res) {
-  const { name, simpledes } = req.body;
-  const userMessage = `Create the description of a fantasy location within an Area the name of ${name} using the basic description of ${simpledes}`;
+  const { name, simpledes, area } = req.body;
+  const currentArea = await dataBaseQuery('SELECT * FROM areas WHERE id = $1',[area])
+  const currentWorld = await dataBaseQuery('SELECT * FROM worlds WHERE id = $1',[currentArea[0].world_id])
+  const userMessage = `Create the description of a fantasy location within ${currentArea[0].name || "fantasy world"} with this description: ${currentArea[0].fulldes || "no description"} within ${currentWorld[0].name || "fantasy world"} with this description: ${currentWorld[0].fulldes || "no description"} with the name of ${name} using the basic description of ${simpledes}`;
   const fullDescription = await chatgtp(req, userMessage, systemContent);
   res.status(200).json({ message: "stream complete" });
 }
 
 async function locationSaveHandler(req, res) {
-  const { name, simpledes, fulldes } = req.body;
-  const data = await dataBaseQuery('INSERT INTO locations (name, simpledes, fulldes) VALUES ($1,$2,$3) RETURNING *;', [name, simpledes, fulldes]);
+  const { name, simpledes, fulldes, area } = req.body;
+  const data = await dataBaseQuery('INSERT INTO locations (name, simpledes, fulldes, area_id) VALUES ($1,$2,$3,$4) RETURNING *;', [name, simpledes, fulldes, area]);
   res.status(200).json({ message: "location saved" });
 }
 

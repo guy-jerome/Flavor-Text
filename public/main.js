@@ -21,6 +21,7 @@ const $areaFullDescription = $('#area-full-description');
 const $areaSaveBtn = $('#area-save-btn')
 const $areaSelect = $('#area-select')
 const $areaSelectBtn = $("#area-select-btn")
+const $areaWorldSelect = $("#area-world-select")
 //Location components
 const $location = $('#location');
 const $locationName = $('#location-name');
@@ -30,11 +31,10 @@ const $locationFullDescription = $('#location-full-description');
 const $locationSaveBtn = $('#location-save-btn')
 const $locationSelect = $('#location-select')
 const $locationSelectBtn = $("#location-select-btn")
+const $locationAreaSelect = $("#location-area-select")
 //Nav components
 const $nav = $("nav")
 const $goMenuBtn = $('#go-menu-btn')
-
-
 
 let page = "menu"
 //btns
@@ -64,6 +64,7 @@ function navigateToWorld(){
   $goMenuBtn.show()
   $nav.show()
   loadSaves($worldSelect)
+
 }
 function navigateToArea(){
   page = "area"
@@ -73,6 +74,7 @@ function navigateToArea(){
   $area.show()
   $nav.show()
   loadSaves($areaSelect)
+  loadSaves($areaWorldSelect)
 }
 function navigateToLocation(){
   page = "location"
@@ -82,6 +84,7 @@ function navigateToLocation(){
   $location.show()
   $nav.show()
   loadSaves($locationSelect)
+  loadSaves($locationAreaSelect)
 }
 
 navigateToArea()
@@ -99,7 +102,7 @@ $goLocationBtn.on("click", navigateToLocation)
 $worldBtn.on("click", ()=>{
   getStream(worldBtns, {
     name: $worldName.val(),
-    simpledes: $worldDescription.val()
+    simpledes: $worldDescription.val(),
   })
 })
 
@@ -117,7 +120,8 @@ $worldSelectBtn.on("click", worldLoadSave)
 $areaBtn.on("click", ()=>{
   getStream(areaBtns, {
     name: $areaName.val(),
-    simpledes: $areaDescription.val()
+    simpledes: $areaDescription.val(),
+    world: $areaWorldSelect.val()
   })
 })
 
@@ -125,7 +129,8 @@ $areaSaveBtn.on("click", ()=>{
   save({
     name: $areaName.val(),
     simpledes: $areaDescription.val(),
-    fulldes: $areaFullDescription.val()
+    fulldes: $areaFullDescription.val(),
+    world: $areaWorldSelect.val()
   })
 })
 
@@ -134,7 +139,8 @@ $areaSelectBtn.on("click", areaLoadSave)
 $locationBtn.on("click", ()=>{
   getStream(locationBtns, {
     name: $locationName.val(),
-    simpledes: $locationDescription.val()
+    simpledes: $locationDescription.val(),
+    area: $locationAreaSelect.val()
   })
 })
 
@@ -142,7 +148,8 @@ $locationSaveBtn.on("click", ()=>{
   save({
     name: $locationName.val(),
     simpledes: $locationDescription.val(),
-    fulldes: $locationFullDescription.val()
+    fulldes: $locationFullDescription.val(),
+    area: $locationAreaSelect.val()
   })
 })
 
@@ -208,8 +215,6 @@ async function save(descriptions) {
       case "location":
         loadSaves($locationSelect)
         break;
-
-
     }
   } catch (error) {
     console.error('Error saving world:', error);
@@ -231,6 +236,33 @@ async function loadSaves(select) {
     console.error('Error fetching worlds:', error);
   }
 }
+
+async function loadSaves(select) {
+  let response;
+  try {
+    switch (select){
+      case $areaWorldSelect:
+        response = await fetch(`/worlds`);
+        break;
+      case $locationAreaSelect:
+        response = await fetch(`/areas`);
+        break;
+      default:
+       response = await fetch(`/${page}s`);
+    }
+    const data = await response.json();
+    select.empty();
+
+    for (let entry of data) {
+      const option = `<option value="${entry.id}">${entry.name}</option>`;
+      select.append(option);
+    }
+  } catch (error) {
+    console.error('Error fetching worlds:', error);
+  }
+}
+
+
 
 async function worldLoadSave() {
   try {
@@ -267,7 +299,6 @@ async function locationLoadSave(){
     console.error('Error loading location:', error);
   }
 }
-
 
 
 
