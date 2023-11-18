@@ -1,3 +1,6 @@
+// import monsterSearch from './monsters.js';
+
+// monsterSearch("fire")
 //Menu components
 const $menu = $('#menu')
 const $goWorldBtn = $('#go-world-btn')
@@ -32,6 +35,8 @@ const $locationSaveBtn = $('#location-save-btn')
 const $locationSelect = $('#location-select')
 const $locationSelectBtn = $("#location-select-btn")
 const $locationAreaSelect = $("#location-area-select")
+const $locationMonsterInput = $('#location-monster-input')
+const $locationMonsteResults = $('#location-monster-results')
 //Nav components
 const $nav = $("nav")
 const $goMenuBtn = $('#go-menu-btn')
@@ -221,21 +226,6 @@ async function save(descriptions) {
   }
 }
 
-async function loadSaves(select) {
-  try {
-    const response = await fetch(`/${page}s`);
-    const data = await response.json();
-
-    select.empty();
-
-    for (let entry of data) {
-      const option = `<option value="${entry.id}">${entry.name}</option>`;
-      select.append(option);
-    }
-  } catch (error) {
-    console.error('Error fetching worlds:', error);
-  }
-}
 
 async function loadSaves(select) {
   let response;

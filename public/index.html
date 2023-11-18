@@ -7,7 +7,7 @@
   <script src="https://code.jquery.com/jquery-3.7.1.js" integrity="sha256-eKhayi8LEQwp4NKxN+CfCh+3qOVUtJn3QNZ0TciWLP4=" crossorigin="anonymous"></script>
   <script defer src="/socket.io/socket.io.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@simondmc/popup-js@1.4.2/popup.min.js"></script>
-  <script defer src="main.js"></script>
+  <script defer type = module src="main.js"></script>
   <link rel="stylesheet" href="main.css"/>
   
 </head>
@@ -54,6 +54,11 @@
       <input type="text" id="location-description" class="input-field">
       <label for="location-area-select" class="input-label">Select The Area For This Location</label>
       <select id="location-area-select" class="select-field"></select>
+      <div id="location-monster-container">
+          <label for="location-monster-input" class="input-label">Search For a Monster</label>
+          <input type="text" id="location-monster-input" class="input-field">
+          
+      </div>
       <button id="location-btn" class="submit-btn">Submit</button>
       <label for="location-full-description" class="input-label">Location Full Description</label>
       <textarea id="location-full-description" class="textarea-field"></textarea>
