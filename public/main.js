@@ -1,6 +1,5 @@
 import {monstersSearch, monsterSearch} from './monsters.js';
 
-
 //Menu components
 const $menu = $('#menu')
 const $goWorldBtn = $('#go-world-btn')
@@ -53,6 +52,54 @@ const areaInput = [$areaName, $areaDescription, $areaFullDescription]
 const locationInput = [$locationName, $locationDescription, $locationFullDescription]
 
 
+function showLoginPopup() {
+  Swal.fire({
+      title: 'Login',
+      html:
+          '<label for="username">Username</label>' +
+          '<input type="text" id="username" class="swal2-input">' +
+          '<label for="password">Password</label>' +
+          '<input type="password" id="password" class="swal2-input">',
+      focusConfirm: false,
+      showCancelButton: true,
+      confirmButtonText: 'Login',
+      cancelButtonText: 'Cancel',
+      preConfirm: () => {
+          const username = Swal.getPopup().querySelector('#username').value;
+          const password = Swal.getPopup().querySelector('#password').value;
+
+          // You can perform login validation here
+          if (!username || !password) {
+              Swal.showValidationMessage('Username and password are required');
+          }
+
+          // Simulate a successful login (replace with your actual login logic)
+          return { username, password };
+      }
+  }).then((result) => {
+      if (result.isConfirmed) {
+          // You can access the entered username and password here
+          const { username, password } = result.value;
+          console.log(`Username: ${username}, Password: ${password}`);
+          // Perform further actions or make an AJAX request for authentication
+      }
+  });
+}
+
+function showSavedPopup() {
+  Swal.fire({
+      toast: true,
+      position: 'top-end',
+      icon: 'success',
+      title: 'Saved',
+      showConfirmButton: false,
+      timer: 1000,
+      customClass: {
+          popup: 'saved-popup'
+      }
+  });
+}
+
 function navigateToMenu(){
   page = "menu"
   $world.hide()
@@ -60,7 +107,6 @@ function navigateToMenu(){
   $location.hide()
   $nav.hide()
   $menu.show()
-  
 }
 function navigateToWorld(){
   page = "world"
@@ -94,7 +140,7 @@ function navigateToLocation(){
   loadSaves($locationAreaSelect)
 }
 
-navigateToLocation()
+navigateToMenu()
 
 const socket = io()
 
@@ -253,6 +299,7 @@ async function save(descriptions) {
       body: JSON.stringify(descriptions)
     });
     const data = await response.json();
+    showSavedPopup()
     switch (page){
       case "world":
         loadSaves($worldSelect)

@@ -18,6 +18,7 @@
     "google-auth-library": "^9.2.0",
     "openai": "^4.17.5",
     "pg": "^8.11.3",
-    "socketio": "^1.0.0"
+    "socketio": "^1.0.0",
+    "sweetalert2": "^11.10.0"
   }
 }

@@ -93,3 +93,28 @@ nav {
 .result-button-added:hover{
   background-color: rgba(165, 42, 42, 0.774);
 }
+
+.swal2-popup {
+  background-color: #2c3e50; /* Dark background color */
+  color: #ecf0f1; /* Light text color */
+  font-family: 'Fantasy', cursive; /* Fantasy font */
+}
+
+.swal2-title {
+  color: #3498db; /* Title color */
+}
+
+.swal2-content {
+  color: #ecf0f1; /* Content text color */
+}
+
+.swal2-input {
+  background-color: #34495e; /* Input background color */
+  color: #ecf0f1; /* Input text color */
+}
+
+.swal2-cancel,
+.swal2-confirm {
+  background-color: #3498db; /* Button background color */
+  color: #ecf0f1; /* Button text color */
+}
