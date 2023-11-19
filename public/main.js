@@ -52,6 +52,7 @@ const worldInput = [$worldName, $worldDescription, $worldFullDescription]
 const areaInput = [$areaName, $areaDescription, $areaFullDescription]
 const locationInput = [$locationName, $locationDescription, $locationFullDescription]
 
+
 function navigateToMenu(){
   page = "menu"
   $world.hide()
@@ -143,19 +144,29 @@ $areaSaveBtn.on("click", ()=>{
 $areaSelectBtn.on("click", areaLoadSave)
 // LOCATION BUTTONS
 $locationBtn.on("click", ()=>{
+  let monsters = []
+  $locationMonsterSelected.children().each((index,element)=>{
+    monsters.push($(element).data('monsterDesc'))
+  })
   getStream(locationBtns, {
     name: $locationName.val(),
     simpledes: $locationDescription.val(),
-    area: $locationAreaSelect.val()
+    area: $locationAreaSelect.val(),
+    monsters: monsters
   })
 })
 
 $locationSaveBtn.on("click", ()=>{
+  let monsters = []
+  $locationMonsterSelected.children().each((index,element)=>{
+    monsters.push($(element).data('monsterDesc'))
+  })
   save({
     name: $locationName.val(),
     simpledes: $locationDescription.val(),
     fulldes: $locationFullDescription.val(),
-    area: $locationAreaSelect.val()
+    area: $locationAreaSelect.val(),
+    monsters: monsters
   })
 })
 
@@ -210,6 +221,7 @@ async function addMonster(monsterName){
     monsterAddedBtn.remove()
   })
   $locationMonsterSelected.append(monsterAddedBtn)
+
 }
 
 async function getStream($btnArray,descriptions) {

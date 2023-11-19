@@ -92,17 +92,22 @@ async function getAreaByIdHandler(req, res) {
 }
 // Location
 async function locationStreamHandler(req, res) {
-  const { name, simpledes, area } = req.body;
+  const { name, simpledes, area, monsters } = req.body;
+  
   const currentArea = await dataBaseQuery('SELECT * FROM areas WHERE id = $1',[area])
   const currentWorld = await dataBaseQuery('SELECT * FROM worlds WHERE id = $1',[currentArea[0].world_id])
-  const userMessage = `Create the description of a fantasy location within ${currentArea[0].name || "fantasy world"} with this description: ${currentArea[0].fulldes || "no description"} within ${currentWorld[0].name || "fantasy world"} with this description: ${currentWorld[0].fulldes || "no description"} with the name of ${name} using the basic description of ${simpledes}`;
+  const userMessage = `Create the description of a fantasy location within ${currentArea[0].name || "fantasy world"}
+  with this description: ${currentArea[0].fulldes || "no description"} within ${currentWorld[0].name || "fantasy world"}
+  with this description: ${currentWorld[0].fulldes || "no description"} with the name of ${name} 
+  using the basic description of ${simpledes}
+  populated with ${monsters.join() || "No monsters" }`;
   const fullDescription = await chatgtp(req, userMessage, systemContent);
   res.status(200).json({ message: "stream complete" });
 }
 
 async function locationSaveHandler(req, res) {
-  const { name, simpledes, fulldes, area } = req.body;
-  const data = await dataBaseQuery('INSERT INTO locations (name, simpledes, fulldes, area_id) VALUES ($1,$2,$3,$4) RETURNING *;', [name, simpledes, fulldes, area]);
+  const { name, simpledes, fulldes, area, monsters } = req.body;
+  const data = await dataBaseQuery('INSERT INTO locations (name, simpledes, fulldes, area_id, monsters) VALUES ($1,$2,$3,$4,$5) RETURNING *;', [name, simpledes, fulldes, area, monsters]);
   res.status(200).json({ message: "location saved" });
 }
 
