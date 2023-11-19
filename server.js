@@ -1,11 +1,13 @@
 const express = require('express');
 const http = require('http');
 const socketIO = require('socket.io');
-const { pipeline } = require('stream');
 const dotenv = require('dotenv');
 const { pool, dataBaseQuery} = require('./db.js');
 const chatgtp = require('./chatgtp.js')
-
+const bcrypt = require("bcrypt")
+const jwt = require('jsonwebtoken')
+const cookie = require('cookie')
+const cookieParser = require("cookie-parser")
 // Load environment variables
 dotenv.config();
 
@@ -19,12 +21,36 @@ const PORT = process.env.PORT || 3000;
 app.use(express.static("public"));
 app.use(express.static('node_modules'));
 app.use(express.json());
-
+app.use(cookieParser())
 // Socket.IO setup
 setupSocketIO();
 
-// Routes
 
+//Authorization 
+const authorization = (req, res, next) =>{
+  const token = req.cookies.jwtToken;
+  if (!token){
+      return res.sendStatus(403)
+  }
+  try{
+      const data =jwt.verify(token, process.env.JWT_SECRET)
+      req.username = data.username
+      return next();
+  }catch{
+      return res.sendStatus(403)
+  }
+}
+
+// Routes
+// SignUp
+app.post('/signup', signupHandler)
+// Login
+app.post('/login', authorization, loginHandler)
+// LogOut
+app.get('/logout', (req, res) => {
+  res.clearCookie('jwtToken'); 
+  res.status(200).json({message:"User Logged Out"})
+});
 // World
 app.post('/world-stream', worldStreamHandler);
 app.post('/world-save', worldSaveHandler);
@@ -43,7 +69,47 @@ app.get('/locations/:id', getLocationByIdHandler);
 
 
 // Route Handlers
-
+// SignUp
+async function signupHandler(req,res){
+  const {username, password} = req.body
+  const data = await dataBaseQuery('SELECT username FROM users WHERE username = $1', [username])
+  if(data.length > 0){
+    res.status(400).json({message: "Username Already Taken"}) 
+  }else{
+    const salt = bcrypt.genSaltSync(10);
+    const hashedPass = bcrypt.hashSync(password,salt)
+    await dataBaseQuery('INSERT INTO users (username, password) VALUES ($1, $2)', [username, hashedPass])
+    res.status(201).json({message: 'Entry added successfully'})
+  }
+}
+// Login
+async function loginHandler(req,res){
+  const {username, password} = req.body
+  const data = await dataBaseQuery('SELECT username, password FROM users WHERE username = $1', [username])
+  if (data.length === 1){
+    const hashedPass = data[0].password
+    bcrypt.compare(password, hashedPass, (err, match)=>{
+        if (err){
+          console.log(hashedPass)
+          console.log(password)
+            res.status(500).json({error: 'Internal Error'})
+        }else if(match){
+            const token = jwt.sign({username}, process.env.JWT_SECRET, { expiresIn: '1h'});
+            const cookieOptions = {
+                maxAge: 3600000,
+                httpOnly: true,
+                secure: process.env.NODE_ENV == 'production'
+            };
+            res.setHeader('Set-Cookie', cookie.serialize('jwtToken', token, cookieOptions));
+            res.status(200).json({message: 'Authenticated'})
+        }else{
+            res.status(401).json({error: 'Authentication Failed'})
+        }
+    })
+  }else{
+    res.status(404).json({error: 'User not found'})
+  }
+}
 // World
 async function worldStreamHandler(req, res) {
   const { name, simpledes } = req.body;

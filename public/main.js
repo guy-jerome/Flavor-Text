@@ -40,6 +40,10 @@ const $locationMonsterSelected = $('#location-monster-selected')
 //Nav components
 const $nav = $("nav")
 const $goMenuBtn = $('#go-menu-btn')
+//Login components
+const $login = $("#login")
+const $loginBtn = $("#login-btn")
+const $signUpBtn = $("#sign-up-btn")
 
 let page = "menu"
 //btns
@@ -76,12 +80,92 @@ function showLoginPopup() {
           // Simulate a successful login (replace with your actual login logic)
           return { username, password };
       }
-  }).then((result) => {
-      if (result.isConfirmed) {
-          // You can access the entered username and password here
-          const { username, password } = result.value;
-          console.log(`Username: ${username}, Password: ${password}`);
-          // Perform further actions or make an AJAX request for authentication
+  }).then( async (userData) => {
+      if (userData.isConfirmed) {
+        const { username, password } = userData.value;
+        const result = await fetch('/login', 
+          {
+            method:"POST",
+            headers: {'Content-Type':'application/json'},
+            body: JSON.stringify({username:username, password:password})
+          })
+          const data = await result.json()
+          let authenticated = false;
+          data.message === "Authenticated"? authenticated = true: authenticated = false;
+          if (authenticated) {
+            // Show a success message
+            Swal.fire({
+                icon: 'success',
+                title: 'Logged In',
+                text: `Welcome ${username} to Flavor Text `,
+            });
+            navigateToMenu()
+          } else {
+            // Handle the case where account creation fails
+            Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: 'Password or Username Incorrect.',
+                timer: 2000,
+            }).then(()=>{
+              showLoginPopup()
+            });
+            
+          }
+      }
+  });
+}
+
+function showSignUpPopup() {
+  Swal.fire({
+      title: 'Create an Account',
+      html:
+          '<label for="username">Username</label>' +
+          '<input type="text" id="username" class="swal2-input">' +
+          '<label for="password">Password</label>' +
+          '<input type="password" id="password" class="swal2-input">',
+      focusConfirm: false,
+      showCancelButton: true,
+      confirmButtonText: 'Create Account',
+      cancelButtonText: 'Cancel',
+      preConfirm: () => {
+          const username = Swal.getPopup().querySelector('#username').value;
+          const password = Swal.getPopup().querySelector('#password').value;
+          // You can perform login validation here
+          if (!username || !password) {
+              Swal.showValidationMessage('Username and password are required');
+          }
+
+          // Simulate a successful login (replace with your actual login logic)
+          return { username, password };
+      }
+  }).then(async (userData) => {
+      if (userData.isConfirmed) {
+          const { username, password } = userData.value;
+          const result = await fetch('/signup', 
+          {
+            method:"POST",
+            headers: {'Content-Type':'application/json'},
+            body: JSON.stringify({username:username, password:password})
+          })
+          const data = await result.json()
+          let accountCreated = false;
+          data.message === "Entry added successfully"?accountCreated = true:accountCreated=false
+          if (accountCreated) {
+            // Show a success message
+            Swal.fire({
+                icon: 'success',
+                title: 'Account Created!',
+                text: `Your account with username ${username} has been successfully created.\n Please Login.`,
+            });
+        } else {
+            // Handle the case where account creation fails
+            Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: 'Account creation failed. Please try again.',
+            });
+        }
       }
   });
 }
@@ -100,8 +184,32 @@ function showSavedPopup() {
   });
 }
 
+function showLogoutPopup() {
+  Swal.fire({
+      toast: true,
+      position: 'top-end',
+      icon: 'success',
+      title: 'Logged Out',
+      showConfirmButton: false,
+      timer: 1000,
+      customClass: {
+          popup: 'saved-popup'
+      }
+  });
+}
+
+function navigateToLogin(){
+  page = "login"
+  $login.show()
+  $menu.hide()
+  $world.hide()
+  $area.hide()
+  $location.hide()
+  $nav.hide()
+}
 function navigateToMenu(){
   page = "menu"
+  $login.hide()
   $world.hide()
   $area.hide()
   $location.hide()
@@ -110,17 +218,17 @@ function navigateToMenu(){
 }
 function navigateToWorld(){
   page = "world"
+  $login.hide()
   $menu.hide()
   $area.hide()
   $location.hide()
   $world.show()
-  $goMenuBtn.show()
   $nav.show()
   loadSaves($worldSelect)
-
 }
 function navigateToArea(){
   page = "area"
+  $login.hide()
   $menu.hide()
   $world.hide()
   $location.hide()
@@ -131,6 +239,7 @@ function navigateToArea(){
 }
 function navigateToLocation(){
   page = "location"
+  $login.hide()
   $menu.hide()
   $world.hide()
   $area.hide()
@@ -140,16 +249,18 @@ function navigateToLocation(){
   loadSaves($locationAreaSelect)
 }
 
-navigateToMenu()
+navigateToLogin()
+
 
 const socket = io()
-
+// LOGIN BUTTONS
+$loginBtn.on("click",showLoginPopup)
+$signUpBtn.on("click",showSignUpPopup)
+// Menu BUTTONS
 $goMenuBtn.on("click", navigateToMenu)
 $goWorldBtn.on("click",navigateToWorld) 
 $goAreaBtn.on("click", navigateToArea)
 $goLocationBtn.on("click", navigateToLocation)
-
-
 
 // WORLD BUTTONS
 $worldBtn.on("click", ()=>{
@@ -377,6 +488,12 @@ async function locationLoadSave(){
   } catch (error){
     console.error('Error loading location:', error);
   }
+}
+
+async function logout(){
+  const response = await fetch('/logout')
+  const data = response.json()
+  navigateToLogin()
 }
 
 
