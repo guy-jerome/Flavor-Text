@@ -1,6 +1,6 @@
-// import monsterSearch from './monsters.js';
+import {monstersSearch, monsterSearch} from './monsters.js';
 
-// monsterSearch("fire")
+
 //Menu components
 const $menu = $('#menu')
 const $goWorldBtn = $('#go-world-btn')
@@ -36,7 +36,8 @@ const $locationSelect = $('#location-select')
 const $locationSelectBtn = $("#location-select-btn")
 const $locationAreaSelect = $("#location-area-select")
 const $locationMonsterInput = $('#location-monster-input')
-const $locationMonsteResults = $('#location-monster-results')
+const $locationMonsterResults = $('#location-monster-results')
+const $locationMonsterSelected = $('#location-monster-selected')
 //Nav components
 const $nav = $("nav")
 const $goMenuBtn = $('#go-menu-btn')
@@ -92,7 +93,7 @@ function navigateToLocation(){
   loadSaves($locationAreaSelect)
 }
 
-navigateToArea()
+navigateToLocation()
 
 const socket = io()
 
@@ -160,6 +161,8 @@ $locationSaveBtn.on("click", ()=>{
 
 $locationSelectBtn.on("click", locationLoadSave)
 
+$locationMonsterInput.on("input",generateMonsters)
+
 
 socket.on('stream-chunk', (chunk) => {
   let currentVal;
@@ -180,6 +183,34 @@ socket.on('stream-chunk', (chunk) => {
 
 });
 
+async function generateMonsters(){
+  const monsters = await monstersSearch($locationMonsterInput.val())
+  if (monsters.length > 0){
+    $locationMonsterResults.empty()
+    monsters.forEach((monster)=>{
+      const monsterBtn = $('<button class="result-button"></button>')
+      monsterBtn.text(monster)
+      monsterBtn.on("click", ()=>{
+        addMonster(monsterBtn.text())
+      })
+      $locationMonsterResults.append(monsterBtn)
+    })
+    $locationMonsterResults.show()
+  }else{
+   $locationMonsterResults.hide()
+  }
+}
+
+async function addMonster(monsterName){
+  const monsterAddedBtn = $('<button class="result-button-added"></button>')
+  monsterAddedBtn.text(monsterName)
+  const monster = await monsterSearch(monsterName)
+  monsterAddedBtn.data('monsterDesc', `name:${monster.name},desc:${monster.desc},size:${monster.size},type:${monster.type}, alignment:${monster.alignment}`)
+  monsterAddedBtn.on("click", ()=>{
+    monsterAddedBtn.remove()
+  })
+  $locationMonsterSelected.append(monsterAddedBtn)
+}
 
 async function getStream($btnArray,descriptions) {
   hideBtns($btnArray)
@@ -253,7 +284,6 @@ async function loadSaves(select) {
 }
 
 
-
 async function worldLoadSave() {
   try {
     const response = await fetch(`/worlds/${$worldSelect.val()}`);
@@ -291,7 +321,6 @@ async function locationLoadSave(){
 }
 
 
-
 function hideBtns($btnArray){
   $btnArray.forEach(($btn)=>{
     $btn.prop("disabled",true)
@@ -303,3 +332,4 @@ function showBtns($btnArray){
     $btn.prop("disabled",false)
   })
 }
+

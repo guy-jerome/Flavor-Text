@@ -86,3 +86,10 @@ nav {
 .menu-btn:hover {
   background-color: #27ae60;
 }
+
+.result-button-added{
+  background-color: #27ae60;
+}
+.result-button-added:hover{
+  background-color: rgba(165, 42, 42, 0.774);
+}
