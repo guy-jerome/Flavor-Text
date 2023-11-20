@@ -14,6 +14,7 @@ const $worldDescription = $('#world-description');
 const $worldBtn = $('#world-btn');
 const $worldFullDescription = $('#world-full-description');
 const $worldSaveBtn = $('#world-save-btn')
+const $worldNewBtn = $("#world-new-btn")
 const $worldSelect = $('#world-select')
 const $worldSelectBtn = $("#world-select-btn")
 //Area components
@@ -23,6 +24,7 @@ const $areaDescription = $('#area-description');
 const $areaBtn = $('#area-btn');
 const $areaFullDescription = $('#area-full-description');
 const $areaSaveBtn = $('#area-save-btn')
+const $areaNewBtn = $("#area-new-btn")
 const $areaSelect = $('#area-select')
 const $areaSelectBtn = $("#area-select-btn")
 const $areaWorldSelect = $("#area-world-select")
@@ -33,6 +35,7 @@ const $locationDescription = $('#location-description');
 const $locationBtn = $('#location-btn');
 const $locationFullDescription = $('#location-full-description');
 const $locationSaveBtn = $('#location-save-btn')
+const $locationNewBtn = $('#location-new-btn')
 const $locationSelect = $('#location-select')
 const $locationSelectBtn = $("#location-select-btn")
 const $locationAreaSelect = $("#location-area-select")
@@ -290,6 +293,7 @@ $worldSaveBtn.on("click", ()=>{
 
 $worldSelectBtn.on("click", worldLoadSave)
 
+$worldNewBtn.on("click", worldClear)
 // AREA BUTTONS
 $areaBtn.on("click", ()=>{
   $areaFullDescription.val("");
@@ -310,6 +314,8 @@ $areaSaveBtn.on("click", ()=>{
 })
 
 $areaSelectBtn.on("click", areaLoadSave)
+
+$areaNewBtn.on("click", areaClear)
 // LOCATION BUTTONS
 
 $locationBtn.on("click", ()=>{
@@ -344,6 +350,7 @@ $locationSelectBtn.on("click", locationLoadSave)
 
 $locationMonsterInput.on("input",generateMonsters)
 
+$locationNewBtn.on("click", locationClear)
 
 socket.on('stream-chunk', (chunk) => {
   let currentVal;
