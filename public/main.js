@@ -273,6 +273,7 @@ $logoutBtn.on("click",logout)
 
 // WORLD BUTTONS
 $worldBtn.on("click", ()=>{
+  $worldFullDescription.val("");
   getStream(worldBtns, {
     name: $worldName.val(),
     simpledes: $worldDescription.val(),
@@ -291,6 +292,7 @@ $worldSelectBtn.on("click", worldLoadSave)
 
 // AREA BUTTONS
 $areaBtn.on("click", ()=>{
+  $areaFullDescription.val("");
   getStream(areaBtns, {
     name: $areaName.val(),
     simpledes: $areaDescription.val(),
@@ -309,7 +311,9 @@ $areaSaveBtn.on("click", ()=>{
 
 $areaSelectBtn.on("click", areaLoadSave)
 // LOCATION BUTTONS
+
 $locationBtn.on("click", ()=>{
+  $locationFullDescription.val()
   let monsters = []
   $locationMonsterSelected.children().each((index,element)=>{
     monsters.push($(element).data('monsterDesc'))
@@ -401,7 +405,6 @@ async function getStream($btnArray,descriptions) {
       body: JSON.stringify(descriptions)
     });
     const data = await response.json();
-    console.log(data);
   } catch (error) {
     console.error('Error fetching stream:', error);
   } finally {
@@ -477,6 +480,12 @@ async function worldLoadSave() {
   }
 }
 
+function worldClear(){
+  $worldName.val("");
+  $worldDescription.val("");
+  $worldFullDescription.val("");
+}
+
 async function areaLoadSave(){
   try{
     const response = await fetch(`/areas/${$areaSelect.val()}`);
@@ -490,6 +499,12 @@ async function areaLoadSave(){
   }
 }
 
+function areaClear(){
+  $areaName.val("");
+  $areaDescription.val("");
+  $areaFullDescription.val("");
+}
+
 async function locationLoadSave(){
   try{
     const response = await fetch(`/locations/${$locationSelect.val()}`);
@@ -501,6 +516,12 @@ async function locationLoadSave(){
     console.error('Error loading location:', error);
 
   }
+}
+
+function locationClear(){
+  $locationName.val("");
+  $locationDescription.val("");
+  $locationFullDescription.val("");
 }
 
 async function logout(){
@@ -523,6 +544,9 @@ async function loginCheck(){
     const data = await response.json()
     username = data.username
     id = data.id
+    worldClear()
+    areaClear()
+    locationClear()
     navigateToMenu()
   } catch (error){
     console.error("User not Authenticated")
