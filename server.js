@@ -35,6 +35,7 @@ const authorization = (req, res, next) =>{
   try{
       const data =jwt.verify(token, process.env.JWT_SECRET)
       req.username = data.username
+      req.id = data.id
       return next();
   }catch{
       return res.sendStatus(403)
@@ -42,30 +43,34 @@ const authorization = (req, res, next) =>{
 }
 
 // Routes
+// Login Check
+app.get('/loginCheck', authorization, (req,res)=>{
+  res.status(200).json({username:req.username, id:req.id})
+})
 // SignUp
 app.post('/signup', signupHandler)
 // Login
-app.post('/login', authorization, loginHandler)
+app.post('/login',  loginHandler)
 // LogOut
 app.get('/logout', (req, res) => {
   res.clearCookie('jwtToken'); 
   res.status(200).json({message:"User Logged Out"})
 });
 // World
-app.post('/world-stream', worldStreamHandler);
-app.post('/world-save', worldSaveHandler);
-app.get('/worlds', getAllWorldsHandler);
-app.get('/worlds/:id', getWorldByIdHandler);
+app.post('/world-stream',authorization, worldStreamHandler);
+app.post('/world-save',authorization, worldSaveHandler);
+app.get('/worlds',authorization, getAllWorldsHandler);
+app.get('/worlds/:id',authorization, getWorldByIdHandler);
 // Area
-app.post('/area-stream', areaStreamHandler);
-app.post('/area-save', areaSaveHandler);
-app.get('/areas', getAllAreasHandler);
-app.get('/areas/:id', getAreaByIdHandler);
+app.post('/area-stream',authorization, areaStreamHandler);
+app.post('/area-save',authorization, areaSaveHandler);
+app.get('/areas',authorization, getAllAreasHandler);
+app.get('/areas/:id',authorization, getAreaByIdHandler);
 // Location
-app.post('/location-stream', locationStreamHandler);
-app.post('/location-save', locationSaveHandler);
-app.get('/locations', getAllLocationsHandler);
-app.get('/locations/:id', getLocationByIdHandler);
+app.post('/location-stream',authorization, locationStreamHandler);
+app.post('/location-save', authorization,locationSaveHandler);
+app.get('/locations',authorization, getAllLocationsHandler);
+app.get('/locations/:id',authorization, getLocationByIdHandler);
 
 
 // Route Handlers
@@ -85,16 +90,17 @@ async function signupHandler(req,res){
 // Login
 async function loginHandler(req,res){
   const {username, password} = req.body
-  const data = await dataBaseQuery('SELECT username, password FROM users WHERE username = $1', [username])
+  const data = await dataBaseQuery('SELECT username, password, id FROM users WHERE username = $1', [username])
   if (data.length === 1){
     const hashedPass = data[0].password
+    const id = data[0].id
     bcrypt.compare(password, hashedPass, (err, match)=>{
         if (err){
           console.log(hashedPass)
           console.log(password)
             res.status(500).json({error: 'Internal Error'})
         }else if(match){
-            const token = jwt.sign({username}, process.env.JWT_SECRET, { expiresIn: '1h'});
+            const token = jwt.sign({username,id}, process.env.JWT_SECRET, { expiresIn: '1h'});
             const cookieOptions = {
                 maxAge: 3600000,
                 httpOnly: true,

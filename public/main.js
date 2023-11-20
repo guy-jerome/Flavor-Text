@@ -2,9 +2,11 @@ import {monstersSearch, monsterSearch} from './monsters.js';
 
 //Menu components
 const $menu = $('#menu')
+const $flavorUsername = $("#flavor-username")
 const $goWorldBtn = $('#go-world-btn')
 const $goAreaBtn = $("#go-area-btn")
 const $goLocationBtn = $("#go-location-btn")
+const $logoutBtn = $("#logout-btn")
 //World components
 const $world = $('#world');
 const $worldName = $('#world-name');
@@ -45,7 +47,10 @@ const $login = $("#login")
 const $loginBtn = $("#login-btn")
 const $signUpBtn = $("#sign-up-btn")
 
-let page = "menu"
+
+let page = "menu";
+let username = "";
+let id = null;
 //btns
 const worldBtns = [$worldSelectBtn,$worldBtn,$worldSaveBtn]
 const areaBtns = [$areaSelectBtn, $areaBtn, $areaSaveBtn];
@@ -206,9 +211,12 @@ function navigateToLogin(){
   $area.hide()
   $location.hide()
   $nav.hide()
+  loginCheck()
 }
 function navigateToMenu(){
   page = "menu"
+  getUser()
+  $flavorUsername.text(username)
   $login.hide()
   $world.hide()
   $area.hide()
@@ -261,6 +269,7 @@ $goMenuBtn.on("click", navigateToMenu)
 $goWorldBtn.on("click",navigateToWorld) 
 $goAreaBtn.on("click", navigateToArea)
 $goLocationBtn.on("click", navigateToLocation)
+$logoutBtn.on("click",logout)
 
 // WORLD BUTTONS
 $worldBtn.on("click", ()=>{
@@ -450,6 +459,7 @@ async function loadSaves(select) {
     }
   } catch (error) {
     console.error('Error fetching worlds:', error);
+    navigateToLogin()
   }
 }
 
@@ -463,6 +473,7 @@ async function worldLoadSave() {
     $worldFullDescription.val(data[0].fulldes);
   } catch (error) {
     console.error('Error loading world:', error);
+
   }
 }
 
@@ -475,6 +486,7 @@ async function areaLoadSave(){
     $areaFullDescription.val(data[0].fulldes);
   } catch (error){
     console.error('Error loading area:', error);
+
   }
 }
 
@@ -487,16 +499,45 @@ async function locationLoadSave(){
     $locationFullDescription.val(data[0].fulldes);
   } catch (error){
     console.error('Error loading location:', error);
+
   }
 }
 
 async function logout(){
-  const response = await fetch('/logout')
-  const data = response.json()
-  navigateToLogin()
+  try{
+    const response = await fetch('/logout')
+    const data = response.json()
+    username = ""
+    id = null
+    navigateToLogin()
+    showLogoutPopup()
+  } catch (error){
+    console.error('Error Logging Out')
+  }
+
 }
 
-
+async function loginCheck(){
+  try{
+    const response = await fetch('/loginCheck')
+    const data = await response.json()
+    username = data.username
+    id = data.id
+    navigateToMenu()
+  } catch (error){
+    console.error("User not Authenticated")
+  }
+}
+async function getUser(){
+  try{
+    const response = await fetch('/loginCheck')
+    const data = await response.json()
+    username = data.username
+    id = data.id
+  } catch (error){
+    console.error("Can't get user and id")
+  }
+}
 function hideBtns($btnArray){
   $btnArray.forEach(($btn)=>{
     $btn.prop("disabled",true)
