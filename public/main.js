@@ -49,6 +49,11 @@ const $goMenuBtn = $('#go-menu-btn')
 const $login = $("#login")
 const $loginBtn = $("#login-btn")
 const $signUpBtn = $("#sign-up-btn")
+//Message components
+const $chatRoom = $("#chat-room")
+const $chatMessages = $("#chat-messages")
+const $chatInput = $("#chat-input")
+const $sendMessageBtn = $("#send-message-btn")
 
 
 let page = "menu";
@@ -219,7 +224,6 @@ function navigateToLogin(){
 function navigateToMenu(){
   page = "menu"
   getUser()
-  $flavorUsername.text(username)
   $login.hide()
   $world.hide()
   $area.hide()
@@ -273,7 +277,8 @@ $goWorldBtn.on("click",navigateToWorld)
 $goAreaBtn.on("click", navigateToArea)
 $goLocationBtn.on("click", navigateToLocation)
 $logoutBtn.on("click",logout)
-
+// Message Buttons
+$sendMessageBtn.on("click",sendMessage )
 // WORLD BUTTONS
 $worldBtn.on("click", ()=>{
   $worldFullDescription.val("");
@@ -539,6 +544,11 @@ async function logout(){
     id = null
     navigateToLogin()
     showLogoutPopup()
+    worldClear()
+    areaClear()
+    locationClear()
+    $chatMessages.empty()
+
   } catch (error){
     console.error('Error Logging Out')
   }
@@ -559,16 +569,19 @@ async function loginCheck(){
     console.error("User not Authenticated")
   }
 }
+
 async function getUser(){
   try{
     const response = await fetch('/loginCheck')
     const data = await response.json()
     username = data.username
     id = data.id
+    $flavorUsername.text(username)
   } catch (error){
     console.error("Can't get user and id")
   }
 }
+
 function hideBtns($btnArray){
   $btnArray.forEach(($btn)=>{
     $btn.prop("disabled",true)
@@ -581,3 +594,19 @@ function showBtns($btnArray){
   })
 }
 
+function appendMessages(name, message){
+  const messageElement = $(`<div class="message-element"><strong>${name}:</strong> ${message}</div>`)
+  $chatMessages.append(messageElement)
+}
+
+function sendMessage(){
+  const message = $chatInput.val()
+  if (message !== " "){
+    socket.emit('message', { name: username, message})
+    $chatInput.val("")
+  }
+}
+
+socket.on('message', (data)=>{
+  appendMessages(data.name, data.message)
+})

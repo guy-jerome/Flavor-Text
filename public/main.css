@@ -43,7 +43,7 @@ main {
   font-size: 14px;
 }
 
-.textarea-field{
+.textarea-field {
   height: 500px;
 }
 
@@ -87,34 +87,89 @@ nav {
   background-color: #27ae60;
 }
 
-.result-button-added{
+.result-button-added {
   background-color: #27ae60;
 }
-.result-button-added:hover{
+
+.result-button-added:hover {
   background-color: rgba(165, 42, 42, 0.774);
 }
 
 .swal2-popup {
-  background-color: #2c3e50; /* Dark background color */
-  color: #ecf0f1; /* Light text color */
-  font-family: 'Fantasy', cursive; /* Fantasy font */
+  background-color: #2c3e50;
+  /* Dark background color */
+  color: #ecf0f1;
+  /* Light text color */
+  font-family: 'Fantasy', cursive;
+  /* Fantasy font */
 }
 
 .swal2-title {
-  color: #3498db; /* Title color */
+  color: #3498db;
+  /* Title color */
 }
 
 .swal2-content {
-  color: #ecf0f1; /* Content text color */
+  color: #ecf0f1;
+  /* Content text color */
 }
 
 .swal2-input {
-  background-color: #34495e; /* Input background color */
-  color: #ecf0f1; /* Input text color */
+  background-color: #34495e;
+  /* Input background color */
+  color: #ecf0f1;
+  /* Input text color */
 }
 
 .swal2-cancel,
 .swal2-confirm {
-  background-color: #3498db; /* Button background color */
-  color: #ecf0f1; /* Button text color */
+  background-color: #3498db;
+  /* Button background color */
+  color: #ecf0f1;
+  /* Button text color */
+}
+
+/* New styles for the chat room */
+#chat-room {
+  margin-top: 20px;
+  display: flex;
+  flex-direction: column;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  padding: 10px;
+}
+
+#chat-messages {
+  max-height: 400px; /* Set a maximum height for the chat area */
+  overflow-y: auto; /* Enable vertical scrolling if content exceeds the height */
+  flex: 1; /* Allow the chat messages to grow and take available space */
+}
+
+#chat-input {
+  margin-top: 10px;
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+}
+
+#send-message-btn {
+  margin-top: 10px;
+  padding: 10px;
+  background-color: #3498db;
+  color: #fff;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+#send-message-btn:hover {
+  background-color: #2980b9;
+}
+
+.message-element {
+  /* Add styling for each chat message */
+  margin-bottom: 5px;
+  padding: 5px;
+  border: 1px solid #ddd;
+  border-radius: 5px;
 }

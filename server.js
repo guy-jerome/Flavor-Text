@@ -255,7 +255,13 @@ async function getLocationByIdHandler(req, res,next) {
 function setupSocketIO() {
   io.on('connection', (socket) => {
     console.log('A user connected');
+
     app.set('socket', socket);
+
+    socket.on('message', (data)=>{
+      io.emit('message', {name:data.name, message:data.message})
+    })
+
     socket.on('disconnect', () => {
       console.log('User disconnected');
     });
